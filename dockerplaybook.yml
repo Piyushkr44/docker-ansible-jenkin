@@ -10,16 +10,21 @@
     
     #Tasks will starts from here
     tasks: 
-        - name: install epel release 
-          #epel enterprise linux it is being specially created for redhat based system
-          dnf: 
-            name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-            update_cache: yes
-            state: present #present or absent
-        - name: Update the RedHat VM
+        - name: Update all installed packages using YUM module
           yum:
-            name: yum-utils
-            state: present
+            name: '*'
+            state: latest
+            update_cache: yes
+            update_only: yes
+        - name: Install yum utils
+          yum:
+            name: "{{ item }}"
+            state: latest
+
+          with_items:
+          - yum-utils
+          - device-mapper-persistent-data
+
         - name: Add docker repo
           yum_repository:
             name: docker
