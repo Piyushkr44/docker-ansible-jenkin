@@ -4,13 +4,6 @@
 ###this minus in yaml indicate a list of items. the play contains a list of play
   hosts: redhat-docker
   tasks:
-    - name: Update all installed packages using YUM module
-      yum:
-        name: '*'
-        state: latest
-        update_cache: yes
-        update_only: yes
-
     - name: Install yum utils
       yum:
         name: "{{ item }}"
