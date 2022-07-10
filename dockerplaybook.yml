@@ -1,40 +1,46 @@
 ---
-#Ansible playbook starts with ---
+#ansy playbook start with three dash
 -
-    hosts: redhat-docker
-    #Hosts name is the managed system name
-    #Declared variable
-    
-    #Tasks will starts from here
-    tasks: 
-        - name: install epel release 
-          #epel enterprise linux it is being specially created for redhat based system
-          dnf: 
-            name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-            update_cache: yes
-            state: present #present or absent
-        - name: Update the RedHat VM
-          yum:
-            name: yum-utils
-            state: present
-        - name: Add docker repo
-          yum_repository:
-            name: docker
-            description: Docker repo
-            baseurl: https://download.docker.com/linux/rhel/docker-ce.repo
-        - name: Adding GPG key
-          rpm_key:
-            key: /path/to/RPM-GPG-KEY.dag.txt
-            fingerprint: 060A 61C5 1B55 8A7F 742B 77AA C52F EB6B 621E 9F35s
-        - name: Download docker engine
-          yum: 
-            name: docker-ce 
-            state: latest 
-            update_cache: true 
-        - name: Start docker
-          service:
-            name: docker 
-            state: started
-    
+###this minus in yaml indicate a list of items. the play contains a list of play
+  hosts: redhat-docker
+  tasks:
+    - name: Update all installed packages using YUM module
+      yum:
+        name: '*'
+        state: latest
+        update_cache: yes
+        update_only: yes
 
+    - name: Install yum utils
+      yum:
+        name: "{{ item }}"
+        state: latest
 
+      with_items:
+      - yum-utils
+      - device-mapper-persistent-data
+
+    - name: Add Docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+      become: yes
+
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: latest
+      become: yes
+
+    - name: install python pip package
+      yum:
+        name: python3-pip
+        state: present
+    - name: install docker module for python
+      pip:
+        name: docker
+    - name: Starting and enabling docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
