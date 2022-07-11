@@ -43,7 +43,14 @@
         packages:
         - docker-ce
         - docker-ce-cli 
-        - containerd.io 
+        - containerd.io
+    - name: install python pip package
+      yum:
+        name: python3-pip
+        state: present
+    - name: install docker module for python
+      pip:
+        name: docker
     - name: download the docker image
       docker_image:
         name: "{{container_image}}"
