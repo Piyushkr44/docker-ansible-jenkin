@@ -1,5 +1,8 @@
 ---
 - hosts: tom-pipeline
+  vars:
+      container_name: myfirstdockercontainer
+      container_image: piyush1607kr/nirvana:v2
   tasks:
 
     - name: Update apt cache
@@ -40,4 +43,13 @@
         packages:
         - docker-ce
         - docker-ce-cli 
-        - containerd.io
+        - containerd.io 
+    - name: download the docker image
+      docker_image:
+        name: "{{container_image}}"
+        source: pull 
+    - name: run the docker container 
+      docker_container:
+        name: "{{container_name}}"
+        image: "{{container_image}}"
+        command: "{{default_container_command}}"
